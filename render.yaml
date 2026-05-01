@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: akshu-mod-server
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install -g pnpm && pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+    startCommand: node /opt/render/project/src/artifacts/api-server/dist/index.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: akshu-mod-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: akshu
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: XOR_KEY
+        sync: false
+
+databases:
+  - name: akshu-mod-db
+    plan: free
+    region: oregon
